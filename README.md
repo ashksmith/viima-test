@@ -1,5 +1,5 @@
 # Viima/Slack Test Bot
-A MVP slack bot that integrates Viima with Slack. Provides simple slash command access to Viima internals from Slack. Written in a few days with no prior experience with any of the tech/products involved except from vim and Firefox. 
+A MVP slack bot that integrates Viima with Slack, written as part of the interview process. Provides simple slash command access to Viima internals from Slack. Written in a few days with no prior experience with any of the tech/products involved except from vim and Firefox. 
 ### Depends on
 * [Node.js](https://nodejs.org/en/)
 * [ngork](https://ngrok.com/) - For external access to node server. This also means that the bot slash commands need their URLs updating each time the server is restarted. Use port 3000.
