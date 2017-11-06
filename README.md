@@ -33,4 +33,6 @@ The bot has 3 methods of interaction between the user, slack and viima.
 /viima <category> <status> - Returns a list of ideas that match the status and category. It only supports the
 default categories and statuses for now. 
 /motd - Returns the same message that pops up when a user logs in to Viima.
+```
+
 The bot will watch for new ideas being posted, test by just adding a new idea to any board. 
