@@ -12,7 +12,7 @@ var http = require('https');
  * @param json The json response from Viima
  */
 exports.post_motd = function(json){
-	if(process.env.DEBUG) console.log('slack post_simple');
+	if(process.env.DEBUG == 1) console.log('slack motd');
 	const postData = JSON.stringify({
 		"text":json.notification_header,
 		"attachments": [{
@@ -29,11 +29,10 @@ exports.post_motd = function(json){
 			'Content-Length': Buffer.byteLength(postData),
 		}
 	};
-
 	const request = http.request(options, (res) => {
 		res.setEncoding('utf8');
 		res.on('data', (chunk) => {
-			if(process.env.DEBUG) console.log('Body: ' + chunk);
+			if(process.env.DEBUG == 1) console.log('Body: ' + chunk);
 		});
 
 		res.on('end', () => {
@@ -50,13 +49,11 @@ exports.post_motd = function(json){
 },
 
 /**
- * @description Posts the response from Viima to requests for updates
+ * @description Posts the result of a query from Slack.. To Slack
  * @param json The json response from Viima
  */
-
-exports.post_activity = function(json, params) {
+exports.post_status_query = function(json, params) {
 	if(process.env.DEBUG == 1) console.log('slack post_activitiy');
-	console.log(json.length);
 	var postData = {
 		"text":"",
 		"attachments":[],
@@ -72,6 +69,7 @@ exports.post_activity = function(json, params) {
 		for(let i = 0; i < json.length; i++){
 			let obj = {
 				"title":json[i].name,
+				// unhard code this
 				"title_link":"https://app.viima.com/ashleyksmith/innovaatioiden-hallinta/?categories=" + json[i].category + "&statuses=" + json[i].status,
 			}
 			postData.attachments.push(obj);
@@ -92,6 +90,11 @@ exports.post_activity = function(json, params) {
 
 	const request = http.request(options, (res) =>{
 	});
+
+	request.on('error', (err) => {
+		console.error('problem with request: ' + err.message);
+	});
+
 	request.write(jsonPostData);
 	request.end();
 
@@ -105,7 +108,8 @@ exports.post_activity = function(json, params) {
 exports.post_simple = function(msg){
 	if(process.env.DEBUG) console.log('slack post_simple');
 	const postData = JSON.stringify({
-		"text":msg
+		"text":msg.text,
+		"attachments":msg.attachments,
 	});
 
 	const options = {
@@ -125,7 +129,7 @@ exports.post_simple = function(msg){
 		});
 
 		res.on('end', () => {
-	  	});
+		});
 	});
 
 	request.on('error', (err) => {

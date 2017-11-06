@@ -7,6 +7,7 @@
 var http = require('https');
 require('dotenv').config();
 var slack = require('./slack');
+var request = require('request');
 
 module.exports = {
 	/**
@@ -45,15 +46,49 @@ module.exports = {
 		request.end();
 	},
 
+	getItems: function(token, callback){
+		if(process.env.DEBUG == 1) console.log('viima.js, getItems');
+		const options = {
+			hostname: process.env.VIIMA_HOST,
+			path: process.env.VIIMA_BOARD + 'items/',
+			method: 'GET',
+			headers: {
+				'Content-Type':'application/json',
+				'Authorization':'Bearer ' + token,
+			}
+		};
+
+		const request = http.request(options, function (res) {
+			var str = '';
+			res.setEncoding('utf8');
+
+			res.on('data', function (chunk){
+				str += chunk;
+			});
+
+			res.on('end', function () {
+				var json = JSON.parse(str);
+				callback(json);
+			})
+		});
+
+		request.on('error', function(error){
+			console.error('Problem with request: ', error.message);
+		});
+
+		request.end();
+	},
+
 	/**
-	 * @description I'm not sure what to call this function yet. It basically takes input from Slack, and responds with a list of items from Viima based on
-	 *              the input from the user. For example /viima customer_support in_progress will return all items in customer support category, and with a
+	 * @description I'm not sure what to call this function yet. It basically takes input from Slack,
+	 * 		and responds with a list of items from Viima based on the input from the user. For
+	 * 		example /viima customer_support in_progress will return all items in customer support category, and with a
 	 *              in_progress status.
 	 * @param {string} token The OAuth of an authenticated user with Viima OAuth servers
 	 * @param {string} params The user input from slack. Must be in the form /viima <category> <status>
-	 * @returns Nothing. 
+	 * @returns Nothing.
 	 */
-	activities: function(token, params) {
+	query_status: function(token, params) {
 		if(process.env.DEBUG == 1) console.log('viima.js, activities');
 		const options = {
 			hostname: process.env.VIIMA_HOST,
@@ -101,14 +136,13 @@ module.exports = {
 				} else {
 
 				}
-				slack.post_activity(parsedJson, params);
+				slack.post_status_query(parsedJson, params);
 			});
 		});
 
 		request.on('error', (e) => {
 			console.error('Problem with request: ' + e.message);
 		});
-
 		request.end();
 	}
 }
